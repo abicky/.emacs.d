@@ -1,0 +1,7 @@
+.DS_Store
+*.elc
+*~
+\#*
+/ac-comphist.dat
+/elpa
+/config/99-private.el

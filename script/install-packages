@@ -1,0 +1,14 @@
+#!/usr/bin/env emacs --script
+
+(require 'cl)
+(load (expand-file-name "../init.el" (file-name-directory load-file-name)) t t)
+
+(let* ((pkg-file (expand-file-name "packages" user-emacs-directory))
+       (pkg-list (when (file-exists-p pkg-file)
+                       (with-temp-buffer
+                         (insert-file-contents pkg-file)
+                         (delete "" (split-string (buffer-string) "\n"))))))
+  (loop for pkg-name in pkg-list
+        for pkg = (intern pkg-name)
+        unless (package-installed-p pkg) do
+          (package-install pkg)))

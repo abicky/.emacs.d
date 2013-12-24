@@ -1,0 +1,12 @@
+--- helm.el.orig	2013-12-23 12:35:32.000000000 +0900
++++ helm.el	2013-12-23 12:36:21.000000000 +0900
+@@ -1586,7 +1586,8 @@
+     (let ((old-overridding-local-map overriding-local-map)
+           ;; #163 no cursor in minibuffer in <=Emacs-24.2.
+           ;; This is not needed in emacs-24.3+
+-          (cursor-in-echo-area t)
++          (unless window-system  ;; cursor is not appeared without the window system
++            (cursor-in-echo-area t))
+           (non-essential t)
+           (old--cua cua-mode)
+           (helm-maybe-use-default-as-input
