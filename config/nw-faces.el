@@ -1,11 +1,11 @@
 (custom-set-faces
  '(link              ((t (:foreground "color-75"))))       ; for Emacs manual
  '(link-visited      ((t (:foreground "brightmagenta"))))  ; for Emacs manual
+ '(match             ((t (:background "yellow"))))         ; for occur
  '(minibuffer-prompt ((t (:foreground "brightcyan"))))
  '(shadow            ((t (:foreground "white"))))          ; for diff
  ;; '(highlight ((t (:foreground "green"))))
  ;; '(info-node ((t (:foreground "brightgreen"))))
- ;; '(match     ((t (:background "yellow"))))
 
  ;; font-lock-mode
  '(font-lock-builtin-face       ((t (:foreground "color-198"))))  ; #include etc...
