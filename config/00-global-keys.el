@@ -2,9 +2,13 @@
 (define-key global-map (kbd "C-c C-i") 'indent-region)
 (define-key global-map (kbd "C-c i")   'imenu)
 (define-key global-map (kbd "C-c r")   'rgrep)
-(define-key global-map (kbd "C-c o")   'occur)
+(define-key global-map (kbd "C-c o")   'occur-with-grep-tag-default)
 (define-key global-map (kbd "C-c ;")   'comment-or-uncomment-region)
 (define-key global-map (kbd "M-?")     'help-for-help)
+
+(defun occur-with-grep-tag-default ()
+  (interactive)
+  (occur (read-regexp "Search in the buffer" (grep-tag-default))))
 
 ;; Assign 'find-function to C-x F
 (find-function-setup-keys)
