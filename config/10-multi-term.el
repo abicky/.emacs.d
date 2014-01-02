@@ -26,6 +26,7 @@ and set the flag to identify if the buffer is created by `multi-term'"
   (set (make-local-variable 'term-prompt-regexp) ".*$ ")
   ;; Set a flag to identify if the buffer is opened by `multi-term'
   (set (make-local-variable 'multi-term-buffer-p) t)
+  (set (make-local-variable 'show-trailing-whitespace) nil)
   (unless multi-term-watch-timer
     (setq multi-term-watch-timer
           (run-with-idle-timer
