@@ -1,0 +1,21 @@
+--- multi-term.el.orig	2014-01-02 16:24:40.000000000 +0900
++++ multi-term.el	2014-01-02 16:25:46.000000000 +0900
+@@ -518,11 +518,15 @@
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilise Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ (defun multi-term-internal ()
+   "Internal handle for `multi-term' buffer."
+-  ;; Add customize keystroke with `term-mode-hook'
+-  (remove-hook 'term-mode-hook 'multi-term-keystroke-setup)
+-  (add-hook 'term-mode-hook 'multi-term-keystroke-setup)
+   ;; Load term mode
+   (term-mode)
++  ;; Add customize keystroke
++  ;; Make `term-raw-map' a local variable not to affect other packages
++  (set (make-local-variable 'term-raw-map) (copy-keymap (default-value 'term-raw-map)))
++  ;; `kill-all-local-variables' is called in `term-mode',
++  ;; so `multi-term-keystroke-setup' should be called after calling `term-mode'
++  ;; and before calling `term-char-mode', which calls `use-local-map'
++  (multi-term-keystroke-setup)
+   (term-char-mode)
+   ;; Handle term buffer close
+   (multi-term-handle-close)
