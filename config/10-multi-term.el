@@ -32,6 +32,9 @@ and set the flag to identify if the buffer is created by `multi-term'"
           (run-with-idle-timer
            multi-term-watch-interval multi-term-watch-interval
            'multi-term-update-history-candidates)))
+  (when multi-term-debug-p
+    (term-start-output-log
+     (format "*Log <%s>*" (buffer-name (current-buffer)))))
   )
 
 (defadvice term-send-raw (around my-term-send-raw activate)
