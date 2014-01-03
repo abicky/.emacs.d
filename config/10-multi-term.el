@@ -74,8 +74,14 @@ and set the flag to identify if the buffer is created by `multi-term'"
   (interactive)
   (let ((point-state (multi-term--get-current-point-state)))
     (cond ((eq point-state 'in-line)
-           ;; TODO: consider line-wrapping
-           (kill-line)
+           ;; "one line" of `term-mode' sometimes straddles multiple lines,
+           ;; so use `kill-new'
+           (let ((beg (point))
+                 ;; `multi-term' can have extra whitespaces in the end of the buffer
+                 (end (save-excursion
+                        (+ (goto-char (point-max)) (skip-syntax-backward " ")))))
+             (kill-new (replace-regexp-in-string
+                        "\n" "" (filter-buffer-substring beg end))))
            (term-send-raw-string "\C-k"))
           ((eq point-state 'in-prompt)
            (message "Read only"))
@@ -90,7 +96,7 @@ and set the flag to identify if the buffer is created by `multi-term'"
                (message "Read only")
              (let ((beg (point))
                    (end (mark)))
-               (kill-region beg end)
+               (copy-region-as-kill beg end)
                (term-send-raw-string
                 (if (> beg end)
                     (make-string (- beg end) ?\C-h)
