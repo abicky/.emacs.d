@@ -53,3 +53,13 @@
   (add-to-list 'helm-source-buffers-list
                '(pattern-transformer helm-buffers-list-pattern-transformer))
   )
+
+
+(when (require 'helm-ag nil t)
+  ;; keybindings for global-map are defined in keybinding.el
+  (setq helm-ag-insert-at-point 'symbol)
+  (setq helm-ag-command-option "-S")
+  ;; Enable `helm-follow-mode'
+  ;; (add-hook 'helm-before-initialize-hook
+  ;;           #'(lambda () (helm-attrset 'follow 1 helm-ag-source)))
+  )

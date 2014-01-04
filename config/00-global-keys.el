@@ -5,6 +5,7 @@
 (define-key global-map (kbd "C-c o")   'occur-with-grep-tag-default)
 (define-key global-map (kbd "C-c ;")   'comment-or-uncomment-region)
 (define-key global-map (kbd "M-?")     'help-for-help)
+(define-key global-map (kbd "M-D")     'backward-kill-word)
 
 (defun occur-with-grep-tag-default ()
   (interactive)
@@ -34,4 +35,11 @@
      (define-key global-map (kbd "M-y")     'helm-show-kill-ring)
      (define-key global-map (kbd "C-c i")   'helm-imenu)
      (define-key global-map (kbd "C-x b")   'helm-buffers-list)
+     (define-key global-map (kbd "M-r")      'helm-resume)
      ))
+
+(eval-after-load "helm-ag"
+  '(progn
+     (global-set-key (kbd "M-g .") 'helm-ag)
+     (global-set-key (kbd "M-g ,") 'helm-ag-pop-stack)
+  ))
