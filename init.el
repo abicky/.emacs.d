@@ -11,8 +11,9 @@
     (init-loader-load))
   ;; Add load paths
   (let ((default-directory (expand-file-name "~/.emacs.d/vendor")))
-    (add-to-list 'load-path default-directory)
-    (normal-top-level-add-subdirs-to-load-path)))
+    (when (file-exists-p default-directory)
+      (add-to-list 'load-path default-directory)
+      (normal-top-level-add-subdirs-to-load-path))))
 
 (defadvice package--make-autoloads-and-compile (before update-list-and-apply-patch activate)
   "Update the package list and apply patches before compiling packages"
