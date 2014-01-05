@@ -1,5 +1,6 @@
 (defvar multi-term-buffer-p nil)
 (defvar multi-term-debug-p nil)
+(defvar multi-term-process nil)
 (defvar multi-term-watch-timer nil)
 (defvar multi-term-watch-interval 0.1)
 (defvar multi-term-history-file (expand-file-name "~/.bash_history"))
@@ -51,6 +52,7 @@ and set the flag to identify if the buffer is created by `multi-term'"
   (set (make-local-variable 'show-trailing-whitespace) nil)
   (set (make-local-variable 'multi-term-point-at-bol) nil)
   (set (make-local-variable 'multi-term-point-at-prompt) nil)
+  (set (make-local-variable 'multi-term-process) (get-buffer-process (current-buffer)))
   (setq term-command-hook 'multi-term--command-hook)
   (define-key term-raw-map [remap term-send-raw] 'multi-term-send-raw)
   (unless multi-term-watch-timer
@@ -152,12 +154,15 @@ and the cursor is in the last line of the terminal"
   "Save points to determine if the cursor is in the last line of the terminal"
   (setq multi-term-point-at-bol (point))
   ;; Set a timer because prompt is not displayed yet
-  (run-with-idle-timer 0.1 nil 'multi-term--set-prompt-point)
+  (run-with-idle-timer 0.1 nil 'multi-term--set-prompt-point multi-term-process)
   (term-command-hook string))
 
-(defun multi-term--set-prompt-point ()
-  (setq multi-term-point-at-prompt
-        (copy-marker (process-mark (get-buffer-process (current-buffer))))))
+(defun multi-term--set-prompt-point (proc)
+  ;; The current buffer can be changed when some terminals are launched at the same time,
+  ;; so switch to the process buffer
+  (with-current-buffer (process-buffer proc)
+    (setq multi-term-point-at-prompt
+          (copy-marker (process-mark proc)))))
 
 (defun multi-term--get-current-point-state ()
   (let ((pos (point)))
@@ -177,7 +182,7 @@ and the cursor is in the last line of the terminal"
     (when (eq (multi-term--get-current-point-state) 'in-line)
       ;; Move the cursor of the terminal
       (let ((beg (point-marker))
-            (end (process-mark (get-buffer-process (current-buffer)))))
+            (end (process-mark multi-term-process)))
         (cond ((> beg end)
                (term-send-raw-string (make-string (- beg end) ?\C-f)))
               ((< beg end)
