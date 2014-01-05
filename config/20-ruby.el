@@ -55,46 +55,40 @@ when `ruby-end-expand-spc-key' is disabled and return key is pressed"
   (ruby-end-mode t)
   (remove-hook 'before-save-hook 'ruby-mode-set-encoding 'local)
 
-  ;; for RSpec
+  ;; For RSpec
   (when (string-match-p "_spec\\'" (file-name-base))
     (let ((rspec-keywords '("describe" "it" "context")))
       (set (make-local-variable 'ruby-block-beg-keywords)
            (append ruby-block-beg-keywords rspec-keywords))
       (set (make-local-variable 'ruby-block-beg-re) (regexp-opt ruby-block-beg-keywords))
       (font-lock-add-keywords nil (list (regexp-opt rspec-keywords 'words)))))
+
+  ;; For adviced ruby-move-to-block
+  (setq ruby-block-keywords
+        (append ruby-block-beg-keywords ruby-block-mid-keywords '("end")))
+  (setq ruby-block-keyword-re (regexp-opt ruby-block-keywords 'symbols))
   )
 
 (add-hook 'ruby-mode-hook 'ruby-mode-init)
 (add-to-list 'auto-mode-alist '("Rakefile\\'" . ruby-mode))
 (add-to-list 'auto-mode-alist '("Gemfile\\'" . ruby-mode))
 
-;; (defadvice ruby-beginning-of-block (before ruby-beginning-of-block-before activate)
-;;   "`ruby-beginning-of-block' moves to the beginning of the parent's block
-;; if its block is empty and the current character is 'n' or 'd' in the keyword 'end'.
-;; This advice fix it."
-;;   (back-to-indentation))
-;; (defadvice ruby-end-of-block (before ruby-end-of-block-before activate)
-;;   "`ruby-end-of-block' moves to the end of the parent's block
-;; if its block is empty and the current character is not the beginning of the block.
-;; This advice fix it."
-;;   (back-to-indentation))
-
 (defadvice ruby-move-to-block (around ruby-move-to-block-fixed activate)
-  "Overwrite `ruby-move-to-block' to work correctly.
-For example, original `ruby-move-to-block' doesn't work correctly in the following case:
+  "Move only one block. For example, when 'if' expression has 'else' block,
+jump to the beginning of 'else' block by executing (ruby-move-to-block 1)
+as shown in the following code:
 
-def foo
-  # press C-M-n here, and jump to 'end' of 'if' expression
-  if true
-    puts 'bar'
-  end
+if condition
+  # jump to 'else' expression when execute (ruby-move-to-block 1)
+  puts 'foo'
+else
+  puts 'bar'
 end
 "
   (let ((current-block-indent (ruby-calculate-indent))
         current-line-indent done)
     (back-to-indentation)
-    (unless (looking-at (if (< n 0) ruby-block-end-re
-                          (concat "\\<\\(" ruby-block-beg-re "\\)\\>")))
+    (unless (looking-at ruby-block-keyword-re)
       (setq current-block-indent (- current-block-indent ruby-indent-level)))
     (while (and (not done) (not (if (< n 0) (bobp) (eobp))))
       (forward-line n)
@@ -109,9 +103,6 @@ end
         (re-search-backward "^=begin\\>"))
        (t
         (setq current-line-indent (current-indentation))
-        (when (and (>= current-block-indent current-line-indent)
-                   (save-excursion
-                     (back-to-indentation)
-                     (not (looking-at (concat "\\<\\(" ruby-block-mid-re "\\)\\>")))))
+        (when (>= current-block-indent current-line-indent)
           (setq done t)))))
     (back-to-indentation)))
