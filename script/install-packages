@@ -11,4 +11,5 @@
   (loop for pkg-name in pkg-list
         for pkg = (intern pkg-name)
         unless (package-installed-p pkg) do
+          (or package-archive-contents (package-refresh-contents))
           (package-install pkg)))
