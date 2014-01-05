@@ -1,6 +1,8 @@
 auto-complete
 cl-lib
+coffee-mode
 ess
+haml-mode
 helm
 helm-ag
 init-loader
@@ -12,4 +14,5 @@ php-mode
 plantuml-mode
 popup
 ruby-end
+scss-mode
 twittering-mode

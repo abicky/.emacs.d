@@ -1,0 +1,10 @@
+(defun scss-mode-init ()
+  (set (make-local-variable 'comment-start) "// ")
+  (set (make-local-variable 'comment-end) "")
+  )
+(add-hook 'scss-mode-hook 'scss-mode-init)
+
+(defun scss-mode-eval-after-load ()
+  (setq scss-compile-at-save nil)
+  )
+(eval-after-load "scss-mode" '(scss-mode-eval-after-load))
