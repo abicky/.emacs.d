@@ -18,33 +18,34 @@
       (indent-line-to indent)
       (when (> offset 0) (forward-char offset)))))
 
-
-(eval-after-load "ruby-end"
-  '(progn
-     ;; Don't insert 'end' when space key is pressed
-     (define-key ruby-end-mode-map (read-kbd-macro ruby-end-expand-spc-key) nil)
-     ;; Overwrite `ruby-end-expand-p'
-     (defadvice ruby-end-expand-p (around ruby-end-expand-p-around activate)
-       "overwrite `ruby-end-expand-p' to insert 'end'
+;; For ruby-end
+(defun ruby-end-after-load ()
+  ;; Don't insert 'end' when space key is pressed
+  (define-key ruby-end-mode-map (read-kbd-macro ruby-end-expand-spc-key) nil)
+  ;; Overwrite `ruby-end-expand-p'
+  (defadvice ruby-end-expand-p (around ruby-end-expand-p-around activate)
+    "Overwrite `ruby-end-expand-p' to insert 'end'
 when `ruby-end-expand-spc-key' is disabled and return key is pressed"
-       (setq ad-return-value
-             (let (beginning-word beginning-indent end-word end-indent)
-               (save-excursion
-                 (newline)
-                 (ruby-beginning-of-block)
-                 (setq beginning-word (current-word))
-                 (setq beginning-indent (current-indentation))
-                 (ruby-end-of-block)
-                 (setq end-word (current-word))
-                 (setq end-indent (current-indentation)))
-               ;; delete LF inserted by (newline)
-               (delete-char 1)
-               (and
-                (or
-                 (not (equal end-word "end"))
-                 ;; the word in the end of the block is 'end' but it is for another block
-                 (not (equal beginning-indent end-indent)))
-                (member beginning-word ruby-block-beg-keywords)))))))
+    (let (beginning-word beginning-indent end-word end-indent)
+      (save-excursion
+        (newline)
+        (ruby-beginning-of-block)
+        (setq beginning-word (current-word))
+        (setq beginning-indent (current-indentation))
+        (ruby-end-of-block)
+        (setq end-word (current-word))
+        (setq end-indent (current-indentation)))
+      ;; delete LF inserted by (newline)
+      (delete-char 1)
+      (setq ad-return-value
+            (and
+             (or
+              (not (equal end-word "end"))
+              ;; the word in the end of the block is 'end' but it is for another block
+              (not (equal beginning-indent end-indent)))
+             (member beginning-word ruby-block-beg-keywords)))))
+  )
+(eval-after-load "ruby-end" '(ruby-end-after-load))
 
 
 (defun ruby-mode-init ()
