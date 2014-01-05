@@ -7,6 +7,7 @@
 (define-key global-map (kbd "M-?")     'help-for-help)
 (define-key global-map (kbd "M-D")     'backward-kill-word)
 (define-key global-map (kbd "M-h")     'apropos)
+(define-key global-map (kbd "C-x B")   'switch-to-bash)
 
 (defun occur-with-grep-tag-default ()
   (interactive)
