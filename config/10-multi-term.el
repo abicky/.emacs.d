@@ -1,5 +1,3 @@
-(setenv "EDITOR" "emacsclient")
-
 (defvar multi-term-buffer-p nil)
 (defvar multi-term-debug-p nil)
 (defvar multi-term-watch-timer nil)
