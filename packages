@@ -1,7 +1,6 @@
 auto-complete
 cl-lib
 ess
-helm
 helm-ag
 init-loader
 jsx-mode

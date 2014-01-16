@@ -1,0 +1,3 @@
+[submodule "vendor/helm"]
+	path = vendor/helm
+	url = git@github.com:abicky/helm.git
