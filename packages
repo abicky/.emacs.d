@@ -6,7 +6,6 @@ helm-ag
 init-loader
 jsx-mode
 markdown-mode
-multi-term
 nodejs-repl
 php-mode
 plantuml-mode
