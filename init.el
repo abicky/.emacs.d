@@ -4,16 +4,17 @@
   (package-initialize))
 
 (when (not noninteractive)  ; not executed with --script option?
-  (when (require 'init-loader nil t)
-    (setq init-loader-byte-compile t
-          init-loader-show-log-after-init nil
-          init-loader-directory (expand-file-name "config" user-emacs-directory))
-    (init-loader-load))
   ;; Add load paths
   (let ((default-directory (expand-file-name "~/.emacs.d/vendor")))
     (when (file-exists-p default-directory)
       (add-to-list 'load-path default-directory)
-      (normal-top-level-add-subdirs-to-load-path))))
+      (normal-top-level-add-subdirs-to-load-path)))
+
+  (when (require 'init-loader nil t)
+    (setq init-loader-byte-compile t
+          init-loader-show-log-after-init nil
+          init-loader-directory (expand-file-name "config" user-emacs-directory))
+    (init-loader-load)))
 
 (defadvice package--make-autoloads-and-compile (before update-list-and-apply-patch activate)
   "Update the package list and apply patches before compiling packages"
