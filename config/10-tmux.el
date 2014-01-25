@@ -4,6 +4,9 @@
   (defvar tmux-current-buffer nil)
   (defvar tmux-current-window
     (shell-command-to-string "tmux display-message -p '#W' | tr -d '\\n'"))
+  (defvar tmux-after-restore-window-conf-hook nil)
+  (defvar tmux-current-directory nil)
+  (defvar tmux-invoked-from-tmux nil)
 
   (defun tmux-zoomed-p ()
     (equal (shell-command-to-string "tmux display-message -p '#F' | tr -d '\\n'") "*Z"))
@@ -21,7 +24,8 @@
   ;; if `tmux-restore-window-conf' is called by emacsclient,
   ;; so save the current window regularly
   (defun tmux-set-current-buffer ()
-    (setq tmux-current-buffer (current-buffer)))
+    (unless (window-minibuffer-p)
+      (setq tmux-current-buffer (current-buffer))))
   (run-with-idle-timer 0.1 0.1 'tmux-set-current-buffer)
 
   (defun tmux-restore-window-conf ()
@@ -31,7 +35,8 @@
                (when (window-splitted-horizontally-p)
                  (resplit-window t)))
               (t (set-window-configuration tmux-window-conf)
-                 (switch-to-buffer tmux-current-buffer))))))
+                 (switch-to-buffer tmux-current-buffer))))
+      (run-hooks 'tmux-after-restore-window-conf-hook)))
 
   (defun tmux-get-in-and-out-zsh ()
     (interactive)
@@ -49,6 +54,27 @@
              ;; if call `tmux-restore-window-conf' immediatelly
              (run-at-time 0.01 nil 'tmux-restore-window-conf)))))
 
+  (defun tmux-find-file (dir)
+    (when (equal tmux-current-window (getenv "EMACS_WINDOW"))
+      (setq tmux-current-directory dir)
+      (setq tmux-invoked-from-tmux t)
+      (add-hook 'tmux-after-restore-window-conf-hook 'tmux--invoke-find-file)
+      (run-at-time 0.01 nil 'tmux-restore-window-conf)))
+
+  (defun tmux--invoke-find-file ()
+    (remove-hook 'tmux-after-restore-window-conf-hook 'tmux--invoke-find-file)
+    (helm-find-files-1 tmux-current-directory))
+
+  (defun tmux--clear-invoked-from-tmux ()
+    (setq tmux-invoked-from-tmux nil))
+
+  (defadvice helm-keyboard-quit (before restore-zsh activate)
+    (when tmux-invoked-from-tmux
+      ;; "Can't expand minibuffer to full frame" error occurs
+      ;; if call `tmux-get-in-and-out-zsh' immediately
+      (run-at-time 0.01 nil 'tmux-get-in-and-out-zsh)))
+
+  (add-hook 'helm-cleanup-hook 'tmux--clear-invoked-from-tmux)
   (define-key global-map (kbd "C-x t") 'tmux-get-in-and-out-zsh)
   (define-key global-map [remap other-window] 'tmux-other-window)
   )
