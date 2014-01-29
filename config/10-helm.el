@@ -11,6 +11,8 @@
   ;; (add-to-list 'helm-completing-read-handlers-alist '(write-file . nil))
   (add-to-list 'helm-completing-read-handlers-alist '(find-alternate-file . nil))
 
+  (setq helm-buffer-max-length 50)
+
   ;; Emulate `kill-line' in helm minibuffer
   (setq helm-delete-minibuffer-contents-from-point t)
   (defadvice helm-delete-minibuffer-contents (before emulate-kill-line activate)
