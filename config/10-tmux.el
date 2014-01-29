@@ -65,6 +65,16 @@
     (remove-hook 'tmux-after-restore-window-conf-hook 'tmux--invoke-find-file)
     (helm-find-files-1 tmux-current-directory))
 
+  (defun tmux-switch-to-buffer ()
+    (when (equal tmux-current-window (getenv "EMACS_WINDOW"))
+      (setq tmux-invoked-from-tmux t)
+      (add-hook 'tmux-after-restore-window-conf-hook 'tmux--invoke-switch-to-buffer)
+      (run-at-time 0.01 nil 'tmux-restore-window-conf)))
+
+  (defun tmux--invoke-switch-to-buffer ()
+    (remove-hook 'tmux-after-restore-window-conf-hook 'tmux--invoke-switch-to-buffer)
+    (helm-buffers-list))
+
   (defun tmux--clear-invoked-from-tmux ()
     (setq tmux-invoked-from-tmux nil))
 
